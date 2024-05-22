@@ -3,7 +3,16 @@ import gradio as gr
 from langchain_groq import ChatGroq
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-VERSION = "v1.0.2"
+PROMPTS = [
+    ("Detect Language", """
+Respond to the user's input language. If the user's input is in [Language 1], respond in [Language 1]. If the user's input is in [Language 2], respond in [Language 2]. If the user's input is in [Language 3], respond in [Language 3], and so on. Continue to adapt the response language to match the user's input language for each subsequent interaction."
+Example:
+"Respond to the user's input language. If the user's input is in Chinese, respond in Chinese. If the user's input is in Spanish, respond in Spanish. If the user's input is in English, respond in English. If the user's input is in French, respond in French, and so on. Continue to adapt the response language to match the user's input language for each subsequent interaction.
+""")
+]
+
+
+VERSION = "v1.1.0"
 
 MAX_TOKENS = os.getenv("MAX_TOKENS")
 if MAX_TOKENS is None:
@@ -18,53 +27,22 @@ GROQ_MODELS = [
     "gemma-7b-it",
 ]
 
-SYSTEM_PROMPTS = {
-    "Default": """
-   You are a powerful assistive AI, designed to provide useful, helpful, and actionable answers to users' queries. Your primary 
-goal is to assist and provide value to the user in each conversation.
 
-    Key Objectives:
-1. Understand the user's request: Comprehend the user's question, concern, or topic, and respond accordingly.
-2. Provide actionable answers: Offer practical, relevant, and informative responses that address the user's query.
-3. Mirror the user's language and tone: Respond in the same language and tone as the user's input, ensuring a natural and conversational flow.
-4. Be helpful and informative: Provide accurate, up-to-date, and relevant information to assist the user.
-5. Maintain a neutral tone: Avoid taking a stance or expressing personal opinions, focusing on providing objective and factual information.
-
-    Language Adaptation:
-1. Detect language: Identify the language of the user's input and respond in the same language.
-2. Support multilingual conversations: Be prepared to respond in languages such as English, Spanish, French, Mandarin Chinese, Japanese, and others.
-3. Use language-specific knowledge: Draw upon language-specific knowledge and cultural nuances to provide more accurate and relevant responses.
-
-    Conversation Guidelines:
-1. Respond in the user's language: If the user asks a question in a specific language, respond in the same language.
-2. Use a conversational tone: Adopt a friendly, approachable, and empathetic tone, while maintaining a professional demeanor.
-3. Keep responses concise and clear: Provide direct and to-the-point answers, avoiding unnecessary complexity or jargon.
-4. Avoid ambiguity and uncertainty: Strive to provide definitive and accurate responses, acknowledging uncertainty only when necessary.
-5. Be respectful and empathetic: Treat users with respect and kindness, acknowledging their emotions and concerns.
-
-    Additional Tips:
-1. Use language-specific formatting: Format responses according to the language's conventions, such as using Chinese characters for Mandarin Chinese or Kanji for Japanese.
-2. Be mindful of cultural differences: Be sensitive to cultural nuances and differences, avoiding unintended offense or misunderstanding.
-
-By following these guidelines, you will become an indispensable resource for users, providing helpful and actionable answers that 
-make a positive impact on their lives.Please try this updated prompt, and let me know if you encounter any further issues!
-"""
-}
-
-
-async def predict(message, history, model_name, temperature, max_tokens, system_prompt: str):
+async def predict(message, history, model_name, temperature, max_tokens, prompt, custom_prompt: str):
     llm = ChatGroq(model_name=model_name, temperature=temperature,
                    streaming=True, max_tokens=max_tokens)
-    history_langchain_format = []
-    if system_prompt.strip() != "":
-        history_langchain_format.append(SystemMessage(content=system_prompt))
+    langchain_history = []
+    if custom_prompt.strip() != "":
+        langchain_history.append(SystemMessage(content=custom_prompt))
+    else:
+        langchain_history.append(SystemMessage(content=prompt))
     for human, ai in history:
-        history_langchain_format.append(HumanMessage(content=human))
-        history_langchain_format.append(AIMessage(content=ai))
-    history_langchain_format.append(HumanMessage(content=message))
+        langchain_history.append(HumanMessage(content=human))
+        langchain_history.append(AIMessage(content=ai))
+    langchain_history.append(HumanMessage(content=message))
 
     message = ""
-    async for chunk in llm.astream(history_langchain_format):
+    async for chunk in llm.astream(langchain_history):
         message = message + chunk.content
         yield message
 
@@ -80,12 +58,15 @@ demo = gr.ChatInterface(
                   value=0.6),
         gr.Number(label="Max Tokens", value=2048,
                   step=1024, minimum=1024, maximum=MAX_TOKENS),
-        gr.TextArea(label="System prompt", value=SYSTEM_PROMPTS["Default"])
+        gr.Dropdown(label="Prompt", choices=PROMPTS, value=PROMPTS[0][1]),
+        gr.TextArea(label="Custom prompt",
+                    placeholder="If leave it empty, use prompt above.")
     ],
     examples=[
         ["What is Decision Tree Regression?"],
         ["Wite a love story with about 10000 words."],
         ["Why should I care about fast inference?"],
+        ["如何配置 Nginx 多域名和 SSL"],
     ],
     cache_examples=False,
     title="Qboot"
