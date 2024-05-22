@@ -2,7 +2,7 @@ import gradio as gr
 from langchain_groq import ChatGroq
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-VERSION = "v1.0.0"
+VERSION = "v1.0.1"
 
 GROQ_MODELS = [
     "llama3-70b-8192",

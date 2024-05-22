@@ -1,15 +1,18 @@
 ---
-title: Qboot - Chat wit GroqCloud
+title: Qboot - Chat wit Groq
 colorFrom: pink
 colorTo: red
 sdk: gradio
 sdk_version: 4.31.5
+python_version: 3.12
 app_file: app.py
 pinned: false
 license: mit
 tags:
     - Groq
+    - GroqCloud
     - Chat
+    - Llama
     - Llama 3
 ---
 
