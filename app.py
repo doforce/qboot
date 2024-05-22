@@ -1,8 +1,15 @@
+import os
 import gradio as gr
 from langchain_groq import ChatGroq
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-VERSION = "v1.0.1"
+VERSION = "v1.0.2"
+
+MAX_TOKENS = os.getenv("MAX_TOKENS")
+if MAX_TOKENS is None:
+    MAX_TOKENS = "8192"
+
+MAX_TOKENS = int(MAX_TOKENS)
 
 GROQ_MODELS = [
     "llama3-70b-8192",
@@ -72,7 +79,7 @@ demo = gr.ChatInterface(
         gr.Slider(label="Temperature", minimum=0.0, maximum=1.0, step=0.1,
                   value=0.6),
         gr.Number(label="Max Tokens", value=2048,
-                  step=1024, minimum=1024, maximum=30000),
+                  step=1024, minimum=1024, maximum=MAX_TOKENS),
         gr.TextArea(label="System prompt", value=SYSTEM_PROMPTS["Default"])
     ],
     examples=[
