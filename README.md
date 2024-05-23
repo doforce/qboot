@@ -13,6 +13,7 @@ tags:
     - Chat
     - Llama
     - Llama 3
+    - Langchain
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference

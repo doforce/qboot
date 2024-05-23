@@ -7,12 +7,12 @@ PROMPTS = [
     ("Detect Language", """
 Respond to the user's input language. If the user's input is in [Language 1], respond in [Language 1]. If the user's input is in [Language 2], respond in [Language 2]. If the user's input is in [Language 3], respond in [Language 3], and so on. Continue to adapt the response language to match the user's input language for each subsequent interaction."
 Example:
-"Respond to the user's input language. If the user's input is in Chinese, respond in Chinese. If the user's input is in Spanish, respond in Spanish. If the user's input is in English, respond in English. If the user's input is in French, respond in French, and so on. Continue to adapt the response language to match the user's input language for each subsequent interaction.
+Respond to the user's input language. If the user's input is in Chinese, respond in Chinese. If the user's input is in Spanish, respond in Spanish. If the user's input is in English, respond in English. If the user's input is in French, respond in French, and so on. Continue to adapt the response language to match the user's input language for each subsequent interaction.
 """)
 ]
 
 
-VERSION = "v1.1.0"
+VERSION = "v1.1.1"
 
 MAX_TOKENS = os.getenv("MAX_TOKENS")
 if MAX_TOKENS is None:
