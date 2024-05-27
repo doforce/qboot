@@ -46,8 +46,7 @@ async def predict(message, history, model_name: str, temperature, max_tokens):
 
 demo = gr.ChatInterface(
     fn=predict,
-    description=f"A Gradio chatbot powered by GroqCloud and Langchain {
-        VERSION}",
+    description="A Gradio chatbot powered by GroqCloud and Langchain " + VERSION,
     additional_inputs_accordion=gr.Accordion(
         label="Parameters", render=False, open=False),
     additional_inputs=[
