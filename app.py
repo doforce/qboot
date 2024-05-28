@@ -24,7 +24,7 @@ Answer: Respond in the same language as the question.
     ),
     (
         "Summarization", """
-Explain the following text in one sentence:
+Summarize the following text into one sentence. 
 text: {input}
 """
     ),
