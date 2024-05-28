@@ -11,13 +11,24 @@ if MAX_TOKENS is None:
 
 MAX_TOKENS = int(MAX_TOKENS)
 
-VERSION = "v1.2.0"
+VERSION = "v1.3.0"
+AI_NAME = "Qboot"
 
-question_template = """
+TEMPLATES = [
+    (
+        "Q&A", """
 Answer the following questions as best you can.
 Question: {input}
-Answer: Respond in the language which above question is using.
+Answer: Respond in the same language as the question.
 """
+    ),
+    (
+        "Summarization", """
+Explain the following text in one sentence:
+text: {input}
+"""
+    ),
+]
 
 GROQ_MODELS = [
     "llama3-70b-8192",
@@ -27,7 +38,7 @@ GROQ_MODELS = [
 ]
 
 
-async def predict(message, history, model_name: str, temperature, max_tokens):
+async def predict(message, history, model_name, template, temperature, max_tokens):
     llm = ChatGroq(model_name=model_name, temperature=temperature,
                    streaming=True, max_tokens=max_tokens)
     langchain_history = []
@@ -35,10 +46,10 @@ async def predict(message, history, model_name: str, temperature, max_tokens):
         langchain_history.append(HumanMessage(content=human))
         langchain_history.append(AIMessage(content=ai))
     prompt_template = ChatPromptTemplate.from_messages(
-        langchain_history + [("human", question_template)])
+        langchain_history + [("human", template)])
 
     chain = prompt_template | llm | StrOutputParser()
-    msg = ''
+    msg = ""
     async for chunk in chain.astream({"input": message}):
         msg = msg + chunk
         yield msg
@@ -51,10 +62,12 @@ demo = gr.ChatInterface(
         label="Parameters", render=False, open=False),
     additional_inputs=[
         gr.Dropdown(label="Model", choices=GROQ_MODELS, value=GROQ_MODELS[0]),
+        gr.Dropdown(label="Prompt template",
+                    choices=TEMPLATES, value=TEMPLATES[0][1]),
         gr.Slider(label="Temperature", minimum=0.0, maximum=1.0, step=0.1,
                   value=0.6),
         gr.Number(label="Max Tokens", value=MAX_TOKENS,
-                  step=1024, minimum=1024, maximum=32768),
+                  step=1024, minimum=1024, maximum=MAX_TOKENS),
     ],
     examples=[
         ["What is Decision Tree Regression"],
@@ -63,6 +76,6 @@ demo = gr.ChatInterface(
         ["llm の事前トレーニングと微調整とは何ですか?またその違いは何ですか"],
     ],
     cache_examples=False,
-    title="Qboot"
+    title=AI_NAME
 )
 demo.launch()
