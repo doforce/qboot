@@ -1,5 +1,5 @@
 ---
-title: Qboot - Chat wit Groq
+title: Qbot - Chat wit Groq
 colorFrom: pink
 colorTo: red
 sdk: gradio
@@ -8,12 +8,12 @@ app_file: app.py
 pinned: false
 license: mit
 tags:
-    - Groq
-    - GroqCloud
-    - Chat
-    - Llama
-    - Llama 3
-    - Langchain
+  - Groq
+  - GroqCloud
+  - Chat
+  - Llama
+  - Llama 3
+  - Langchain
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference

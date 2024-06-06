@@ -11,8 +11,8 @@ if MAX_TOKENS is None:
 
 MAX_TOKENS = int(MAX_TOKENS)
 
-VERSION = "v1.3.0"
-AI_NAME = "Qboot"
+VERSION = "v1.3.1"
+AI_NAME = "Qbot"
 
 TEMPLATES = [
     (
