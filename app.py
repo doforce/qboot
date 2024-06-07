@@ -1,3 +1,4 @@
+import requests
 import os
 import gradio as gr
 from langchain_groq import ChatGroq
@@ -11,7 +12,7 @@ if MAX_TOKENS is None:
 
 MAX_TOKENS = int(MAX_TOKENS)
 
-VERSION = "v1.3.1"
+VERSION = "v1.3.2"
 AI_NAME = "Qbot"
 
 TEMPLATES = [
@@ -30,12 +31,26 @@ text: {input}
     ),
 ]
 
-GROQ_MODELS = [
-    "llama3-70b-8192",
-    "mixtral-8x7b-32768",
-    "gemma-7b-it",
-    "llama3-8b-8192",
-]
+
+def load_models():
+    api_key = os.environ.get("GROQ_API_KEY")
+    url = "https://api.groq.com/openai/v1/models"
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.get(url, headers=headers)
+    result = response.json()
+
+    models = [obj['id']
+              for obj in result['data'] if obj['active']]
+    models.sort(key=lambda x: not x.startswith('llama3-70b'))
+    return models
+
+
+GROQ_MODELS = load_models()
 
 
 async def predict(message, history, model_name, template, temperature, max_tokens):
